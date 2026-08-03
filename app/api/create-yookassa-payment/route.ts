@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import fetch from 'node-fetch';
+
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -48,3 +48,4 @@ export async function POST(req: Request) {
   const redirectUrl = data.confirmation?.confirmation_url || data.confirmation?.redirect_url;
   return NextResponse.json({ url: redirectUrl, payment: data });
 }
+

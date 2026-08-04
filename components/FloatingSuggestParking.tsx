@@ -1,0 +1,168 @@
+﻿'use client';
+
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
+
+export default function FloatingSuggestParking() {
+  const pathname = usePathname();
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const [form, setForm] = useState({
+    name: '',
+    address: '',
+    description: '',
+    latitude: '',
+    longitude: '',
+  });
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
+  async function useMyLocation() {
+    if (!navigator.geolocation) {
+      setMessage('Геолокация не поддерживается браузером');
+      return;
+    }
+
+    setMessage('Определяю местоположение...');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setForm((prev) => ({
+          ...prev,
+          latitude: String(position.coords.latitude),
+          longitude: String(position.coords.longitude),
+        }));
+        setMessage('Координаты подставлены');
+      },
+      () => {
+        setMessage('Не удалось получить местоположение');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      },
+    );
+  }
+
+  async function submit() {
+    setLoading(true);
+    setMessage('');
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+
+    if (!token) {
+      setLoading(false);
+      setMessage('Чтобы предложить парковку, сначала войдите в аккаунт.');
+      return;
+    }
+
+    const res = await fetch('/api/suggest-parking', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ...form,
+        latitude: Number(form.latitude),
+        longitude: Number(form.longitude),
+      }),
+    });
+
+    const json = await res.json();
+    setLoading(false);
+
+    if (!res.ok) {
+      setMessage(json.error || 'Ошибка отправки');
+      return;
+    }
+
+    setMessage(json.message || 'Парковка отправлена на проверку');
+    setForm({
+      name: '',
+      address: '',
+      description: '',
+      latitude: '',
+      longitude: '',
+    });
+  }
+
+  return (
+    <>
+      <button className="suggest-floating-button" onClick={() => setOpen(true)}>
+        Предложить парковку
+      </button>
+
+      {open ? (
+        <div className="suggest-modal-backdrop">
+          <div className="suggest-modal">
+            <div className="suggest-modal-header">
+              <h2>Предложить парковку</h2>
+              <button onClick={() => setOpen(false)}>×</button>
+            </div>
+
+            <p className="suggest-muted">
+              Отправьте точку парковки. После проверки администратором она появится на карте.
+            </p>
+
+            <div className="suggest-form">
+              <input
+                className="text-input"
+                placeholder="Название"
+                value={form.name}
+                onChange={(event) => setForm({ ...form, name: event.target.value })}
+              />
+
+              <input
+                className="text-input"
+                placeholder="Адрес"
+                value={form.address}
+                onChange={(event) => setForm({ ...form, address: event.target.value })}
+              />
+
+              <textarea
+                className="suggest-textarea"
+                placeholder="Описание"
+                value={form.description}
+                onChange={(event) => setForm({ ...form, description: event.target.value })}
+              />
+
+              <div className="suggest-two-cols">
+                <input
+                  className="text-input"
+                  placeholder="Широта"
+                  value={form.latitude}
+                  onChange={(event) => setForm({ ...form, latitude: event.target.value })}
+                />
+
+                <input
+                  className="text-input"
+                  placeholder="Долгота"
+                  value={form.longitude}
+                  onChange={(event) => setForm({ ...form, longitude: event.target.value })}
+                />
+              </div>
+
+              <button className="secondary-button" type="button" onClick={useMyLocation}>
+                Подставить мои координаты
+              </button>
+
+              <button className="primary-button" disabled={loading} onClick={submit}>
+                {loading ? 'Отправка...' : 'Отправить на проверку'}
+              </button>
+
+              {message ? <div className="suggest-message">{message}</div> : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}

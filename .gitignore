@@ -7,3 +7,12 @@ node_modules/
 admin_patch.zip
 *.bak
 app_backup_*/
+.vercel
+dist
+build
+coverage
+.env.vercel
+vercel.env
+.env*
+tsconfig.tsbuildinfo
+.DS_Store

@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabaseClient';
+
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
+  ssr: false,
+  loading: () => <div className="admin-map-loading">Загрузка карты...</div>,
+});
 
 export default function FloatingSuggestParking() {
   const pathname = usePathname();
@@ -15,8 +21,8 @@ export default function FloatingSuggestParking() {
     name: '',
     address: '',
     description: '',
-    latitude: '',
-    longitude: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
 
   if (pathname?.startsWith('/admin')) {
@@ -35,8 +41,8 @@ export default function FloatingSuggestParking() {
       (position) => {
         setForm((prev) => ({
           ...prev,
-          latitude: String(position.coords.latitude),
-          longitude: String(position.coords.longitude),
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
         }));
         setMessage('Координаты подставлены');
       },
@@ -60,6 +66,12 @@ export default function FloatingSuggestParking() {
     if (!token) {
       setLoading(false);
       setMessage('Чтобы предложить парковку, сначала войдите в аккаунт.');
+      return;
+    }
+
+    if (form.latitude === null || form.longitude === null) {
+      setLoading(false);
+      setMessage('Сначала выберите точку на карте');
       return;
     }
 
@@ -89,8 +101,8 @@ export default function FloatingSuggestParking() {
       name: '',
       address: '',
       description: '',
-      latitude: '',
-      longitude: '',
+      latitude: null,
+      longitude: null,
     });
   }
 
@@ -109,7 +121,7 @@ export default function FloatingSuggestParking() {
             </div>
 
             <p className="suggest-muted">
-              Отправьте точку парковки. После проверки администратором она появится на карте.
+              Кликните по карте, чтобы поставить точку. После проверки администратором она появится на карте.
             </p>
 
             <div className="suggest-form">
@@ -134,21 +146,26 @@ export default function FloatingSuggestParking() {
                 onChange={(event) => setForm({ ...form, description: event.target.value })}
               />
 
-              <div className="suggest-two-cols">
-                <input
-                  className="text-input"
-                  placeholder="Широта"
-                  value={form.latitude}
-                  onChange={(event) => setForm({ ...form, latitude: event.target.value })}
-                />
-
-                <input
-                  className="text-input"
-                  placeholder="Долгота"
-                  value={form.longitude}
-                  onChange={(event) => setForm({ ...form, longitude: event.target.value })}
-                />
-              </div>
+              <LocationPicker
+                value={{
+                  lat: form.latitude,
+                  lng: form.longitude,
+                }}
+                onChange={({ lat, lng }) =>
+                  setForm({
+                    ...form,
+                    latitude: lat,
+                    longitude: lng,
+                  })
+                }
+                onAddressChange={(address) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    address: prev.address.trim() ? prev.address : address,
+                  }))
+                }
+                height={340}
+              />
 
               <button className="secondary-button" type="button" onClick={useMyLocation}>
                 Подставить мои координаты
@@ -166,3 +183,4 @@ export default function FloatingSuggestParking() {
     </>
   );
 }
+

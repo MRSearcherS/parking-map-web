@@ -1,6 +1,7 @@
 ﻿import FloatingSuggestParking from '@/components/FloatingSuggestParking';
 import type { Metadata } from 'next';
 import './globals.css';
+import FloatingPasswordReset from '@/components/FloatingPasswordReset';
 
 export const metadata: Metadata = {
   title: 'Бесплатные парковки',
@@ -11,8 +12,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru">
       <body>{children}
-        <FloatingSuggestParking /></body>
+        <FloatingSuggestParking />        <FloatingPasswordReset />
+      </body>
     </html>
   );
 }
+
 

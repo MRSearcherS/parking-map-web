@@ -1,5 +1,11 @@
 @import 'leaflet/dist/leaflet.css';
 
+.leaflet-control-attribution::before,
+.leaflet-control-attribution img {
+  display: none !important;
+  content: none !important;
+}
+
 :root {
   color-scheme: light;
   --bg: #f5f7f2;

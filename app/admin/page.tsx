@@ -9,6 +9,11 @@ const AdminParkingMap = dynamic(() => import('@/components/AdminParkingMap'), {
   loading: () => <div className="admin-map-loading">Загрузка карты...</div>,
 });
 
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
+  ssr: false,
+  loading: () => <div className="admin-map-loading">Загрузка карты...</div>,
+});
+
 type AdminUser = {
   id: string;
   email: string | null;
@@ -59,12 +64,12 @@ export default function AdminPage() {
     name: '',
     address: '',
     description: '',
-    latitude: '',
-    longitude: '',
     is_free: true,
     is_verified: true,
     is_approved: true,
     is_demo: false,
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
 
   const pendingParkings = useMemo(() => {
@@ -141,7 +146,6 @@ export default function AdminPage() {
     }
 
     const admin = profile?.access_level === 'admin';
-
     setIsAdmin(admin);
     setSessionChecked(true);
 
@@ -246,6 +250,11 @@ export default function AdminPage() {
   }
 
   async function createParking() {
+    if (newParking.latitude === null || newParking.longitude === null) {
+      setMessage('Сначала выберите точку на карте');
+      return;
+    }
+
     setLoading(true);
     setMessage('');
 
@@ -271,8 +280,8 @@ export default function AdminPage() {
       name: '',
       address: '',
       description: '',
-      latitude: '',
-      longitude: '',
+      latitude: null,
+      longitude: null,
       is_free: true,
       is_verified: true,
       is_approved: true,
@@ -454,10 +463,27 @@ export default function AdminPage() {
             <input className="text-input" placeholder="Адрес" value={newParking.address} onChange={(e) => setNewParking({ ...newParking, address: e.target.value })} />
             <textarea className="admin-textarea" placeholder="Описание" value={newParking.description} onChange={(e) => setNewParking({ ...newParking, description: e.target.value })} />
 
-            <div className="admin-two-cols">
-              <input className="text-input" placeholder="Широта, например 55.7558" value={newParking.latitude} onChange={(e) => setNewParking({ ...newParking, latitude: e.target.value })} />
-              <input className="text-input" placeholder="Долгота, например 37.6173" value={newParking.longitude} onChange={(e) => setNewParking({ ...newParking, longitude: e.target.value })} />
-            </div>
+            <LocationPicker
+              value={{
+                lat: newParking.latitude,
+                lng: newParking.longitude,
+              }}
+              onChange={({ lat, lng }) =>
+                setNewParking({
+                  ...newParking,
+                  latitude: lat,
+                  longitude: lng,
+                })
+              }
+              onAddressChange={(address) =>
+                setNewParking((prev) => ({
+                  ...prev,
+                  address: prev.address.trim() ? prev.address : address,
+                }))
+              }
+              existingParkings={data.parkings}
+              height={420}
+            />
 
             <label className="admin-checkbox">
               <input type="checkbox" checked={newParking.is_free} onChange={(e) => setNewParking({ ...newParking, is_free: e.target.checked })} />
@@ -486,3 +512,4 @@ export default function AdminPage() {
     </main>
   );
 }
+

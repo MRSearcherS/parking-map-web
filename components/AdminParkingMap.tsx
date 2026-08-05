@@ -74,8 +74,8 @@ export default function AdminParkingMap({ parkings }: Props) {
     >        <AttributionControl prefix={false} />
 
       <TileLayer
-        attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        attribution="OpenStreetMap"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
       {validParkings.map((parking) => (
@@ -107,5 +107,6 @@ export default function AdminParkingMap({ parkings }: Props) {
     </MapContainer>
   );
 }
+
 
 

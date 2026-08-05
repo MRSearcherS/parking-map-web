@@ -40,8 +40,8 @@ export default function ParkingMap({ center, parkings, isPro, loading }: Props) 
       >        <AttributionControl prefix={false} />
 
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution="OpenStreetMap"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
         {parkings.map((parking) => (
@@ -72,5 +72,6 @@ function formatDistance(meters: number) {
   if (meters < 1000) return `${Math.round(meters)} м`;
   return `${(meters / 1000).toFixed(1)} км`;
 }
+
 
 

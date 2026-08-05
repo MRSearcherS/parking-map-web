@@ -1,9 +1,10 @@
-'use client';
+﻿'use client';
 
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthPanel } from '@/components/AuthPanel';
 import { Paywall } from '@/components/Paywall';
+import FloatingSuggestParking from '@/components/FloatingSuggestParking';
 import { getAccessState, type AccessState } from '@/lib/access';
 import { getNearbyParkings, type ParkingPlace } from '@/lib/parking';
 
@@ -107,6 +108,7 @@ export default function HomePage() {
 
         <aside className="side-panel">
           <AuthPanel access={access} onAuthChange={refreshAccess} />
+          <FloatingSuggestParking embedded />
           <Paywall isPro={access.isPro} nearbyCount={nearbyCount} />
 
           <div className="compact-card">
@@ -122,3 +124,4 @@ export default function HomePage() {
     </main>
   );
 }
+

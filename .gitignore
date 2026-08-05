@@ -16,3 +16,5 @@ vercel.env
 .env*
 tsconfig.tsbuildinfo
 .DS_Store
+parking-map-web-code-snapshot.txt
+

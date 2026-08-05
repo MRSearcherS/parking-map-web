@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useMemo, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { AttributionControl, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
 type ExistingParking = {
@@ -288,16 +288,18 @@ export default function LocationPicker({
         center={markerPosition ?? center}
         zoom={zoom}
         scrollWheelZoom
-        style={{
+      attributionControl={false}
+      style={{
           height,
           width: '100%',
           borderRadius: 12,
           overflow: 'hidden',
         }}
-      >
+      >        <AttributionControl prefix={false} />
+
         <TileLayer
-          attribution="OpenStreetMap"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
         <ClickHandler onPick={({ lat, lng }) => pickPoint(lat, lng)} />
@@ -367,3 +369,5 @@ export default function LocationPicker({
     </div>
   );
 }
+
+

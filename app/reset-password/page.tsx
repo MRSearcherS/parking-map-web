@@ -1,16 +1,36 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
 
+  const [ready, setReady] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('Проверяем ссылку восстановления...');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      const sessionExists = Boolean(data.session);
+
+      setHasSession(sessionExists);
+      setReady(true);
+
+      if (sessionExists) {
+        setMessage('');
+      } else {
+        setMessage('Ссылка восстановления недействительна или устарела. Запросите новое письмо.');
+      }
+    }
+
+    checkSession();
+  }, []);
 
   async function updatePassword() {
     setMessage('');
@@ -31,17 +51,21 @@ export default function ResetPasswordPage() {
       password,
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       setMessage(error.message);
       return;
     }
 
-    setMessage('Пароль изменён. Сейчас перенаправим вас...');
+    sessionStorage.removeItem('passwordRecoveryInProgress');
+    await supabase.auth.signOut();
+
+    setLoading(false);
+    setMessage('Пароль изменён. Теперь можно войти с новым паролем.');
+
     setTimeout(() => {
       router.push('/');
-    }, 1200);
+    }, 1400);
   }
 
   return (
@@ -51,25 +75,35 @@ export default function ResetPasswordPage() {
         <p>Введите новый пароль для вашего аккаунта.</p>
 
         <div className="admin-form">
-          <input
-            className="text-input"
-            type="password"
-            placeholder="Новый пароль"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {ready && hasSession ? (
+            <>
+              <input
+                className="text-input"
+                type="password"
+                placeholder="Новый пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-          <input
-            className="text-input"
-            type="password"
-            placeholder="Повторите пароль"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+              <input
+                className="text-input"
+                type="password"
+                placeholder="Повторите пароль"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    updatePassword();
+                  }
+                }}
+              />
 
-          <button className="primary-button" disabled={loading} onClick={updatePassword}>
-            {loading ? 'Сохранение...' : 'Сохранить новый пароль'}
-          </button>
+              <button className="primary-button" disabled={loading} onClick={updatePassword}>
+                {loading ? 'Сохранение...' : 'Сохранить новый пароль'}
+              </button>
+            </>
+          ) : null}
 
           {message ? <div className="admin-message">{message}</div> : null}
         </div>

@@ -1,9 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { LogIn, LogOut, UserPlus } from 'lucide-react';
 import type { AccessState } from '@/lib/access';
 import { supabase } from '@/lib/supabaseClient';
+import PasswordResetAction from '@/components/PasswordResetAction';
 
 type Props = {
   access: AccessState;
@@ -19,7 +20,9 @@ export function AuthPanel({ access, onAuthChange }: Props) {
   async function signIn() {
     setBusy(true);
     setMessage('');
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+
     setBusy(false);
 
     if (error) {
@@ -33,7 +36,9 @@ export function AuthPanel({ access, onAuthChange }: Props) {
   async function signUp() {
     setBusy(true);
     setMessage('');
+
     const { error } = await supabase.auth.signUp({ email, password });
+
     setBusy(false);
 
     if (error) {
@@ -69,6 +74,7 @@ export function AuthPanel({ access, onAuthChange }: Props) {
     <div className="auth-card">
       <h2>Вход</h2>
       <p>Войдите или создайте аккаунт. PRO-доступ в MVP включается вручную в Supabase.</p>
+
       <div className="auth-form">
         <input
           className="text-input"
@@ -77,6 +83,7 @@ export function AuthPanel({ access, onAuthChange }: Props) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
         />
+
         <input
           className="text-input"
           type="password"
@@ -84,14 +91,19 @@ export function AuthPanel({ access, onAuthChange }: Props) {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
+
         <div className="button-row">
           <button className="primary-button" disabled={busy} onClick={signIn}>
             <LogIn size={18} /> Войти
           </button>
+
           <button className="secondary-button" disabled={busy} onClick={signUp}>
             <UserPlus size={18} /> Создать
           </button>
         </div>
+
+        <PasswordResetAction email={email} disabled={busy} />
+
         {message ? <p>{message}</p> : null}
       </div>
     </div>

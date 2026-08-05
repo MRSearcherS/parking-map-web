@@ -10,7 +10,11 @@ const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
   loading: () => <div className="admin-map-loading">Загрузка карты...</div>,
 });
 
-export default function FloatingSuggestParking() {
+type Props = {
+  embedded?: boolean;
+};
+
+export default function FloatingSuggestParking({ embedded = false }: Props) {
   const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
@@ -25,7 +29,7 @@ export default function FloatingSuggestParking() {
     longitude: null as number | null,
   });
 
-  if (pathname?.startsWith('/admin')) {
+  if (!embedded && pathname?.startsWith('/admin')) {
     return null;
   }
 
@@ -108,7 +112,11 @@ export default function FloatingSuggestParking() {
 
   return (
     <>
-      <button className="suggest-floating-button" onClick={() => setOpen(true)}>
+      <button
+        className={embedded ? 'suggest-inline-button' : 'suggest-floating-button'}
+        type="button"
+        onClick={() => setOpen(true)}
+      >
         Предложить парковку
       </button>
 
@@ -117,7 +125,9 @@ export default function FloatingSuggestParking() {
           <div className="suggest-modal">
             <div className="suggest-modal-header">
               <h2>Предложить парковку</h2>
-              <button onClick={() => setOpen(false)}>×</button>
+              <button type="button" onClick={() => setOpen(false)}>
+                x
+              </button>
             </div>
 
             <p className="suggest-muted">
@@ -183,4 +193,3 @@ export default function FloatingSuggestParking() {
     </>
   );
 }
-

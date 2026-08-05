@@ -1,6 +1,7 @@
 ﻿'use client';
 
-import { AttributionControl, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import GeolocationControl from './GeolocationControl';
 import L from 'leaflet';
 
 type AdminParking = {
@@ -56,13 +57,13 @@ export default function AdminParkingMap({ parkings }: Props) {
     (p) => Number.isFinite(p.latitude) && Number.isFinite(p.longitude),
   );
 
-  const center = validParkings[0]
+  const center: [number, number] = validParkings[0]
     ? [validParkings[0].latitude, validParkings[0].longitude]
     : [55.7558, 37.6173];
 
   return (
     <MapContainer
-      center={center as [number, number]}
+      center={center}
       zoom={12}
       scrollWheelZoom
       attributionControl={false}
@@ -71,7 +72,8 @@ export default function AdminParkingMap({ parkings }: Props) {
         width: '100%',
         borderRadius: 12,
       }}
-    >        <AttributionControl prefix={false} />
+    >
+      <GeolocationControl autoLocate />
 
       <TileLayer
         attribution="OpenStreetMap"
@@ -107,6 +109,3 @@ export default function AdminParkingMap({ parkings }: Props) {
     </MapContainer>
   );
 }
-
-
-

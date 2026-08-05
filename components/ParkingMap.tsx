@@ -1,4 +1,7 @@
-﻿import { AttributionControl, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+﻿'use client';
+
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import GeolocationControl from './GeolocationControl';
 import L from 'leaflet';
 import type { ParkingPlace } from '@/lib/parking';
 
@@ -37,7 +40,8 @@ export default function ParkingMap({ center, parkings, isPro, loading }: Props) 
         scrollWheelZoom
         attributionControl={false}
         className="map-root"
-      >        <AttributionControl prefix={false} />
+      >
+        <GeolocationControl autoLocate />
 
         <TileLayer
           attribution="OpenStreetMap"
@@ -72,6 +76,3 @@ function formatDistance(meters: number) {
   if (meters < 1000) return `${Math.round(meters)} м`;
   return `${(meters / 1000).toFixed(1)} км`;
 }
-
-
-

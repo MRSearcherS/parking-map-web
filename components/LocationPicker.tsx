@@ -1,7 +1,8 @@
 ﻿'use client';
 
 import { useMemo, useState } from 'react';
-import { AttributionControl, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import GeolocationControl from './GeolocationControl';
 import L from 'leaflet';
 
 type ExistingParking = {
@@ -288,14 +289,15 @@ export default function LocationPicker({
         center={markerPosition ?? center}
         zoom={zoom}
         scrollWheelZoom
-      attributionControl={false}
-      style={{
+        attributionControl={false}
+        style={{
           height,
           width: '100%',
           borderRadius: 12,
           overflow: 'hidden',
         }}
-      >        <AttributionControl prefix={false} />
+      >
+        <GeolocationControl autoLocate />
 
         <TileLayer
           attribution="OpenStreetMap"
@@ -369,6 +371,3 @@ export default function LocationPicker({
     </div>
   );
 }
-
-
-

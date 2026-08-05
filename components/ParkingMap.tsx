@@ -1,4 +1,4 @@
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+﻿import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import type { ParkingPlace } from '@/lib/parking';
 
@@ -38,8 +38,8 @@ export default function ParkingMap({ center, parkings, isPro, loading }: Props) 
         className="map-root"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
         {parkings.map((parking) => (
@@ -70,3 +70,4 @@ function formatDistance(meters: number) {
   if (meters < 1000) return `${Math.round(meters)} м`;
   return `${(meters / 1000).toFixed(1)} км`;
 }
+

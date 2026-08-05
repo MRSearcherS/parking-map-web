@@ -296,8 +296,8 @@ export default function LocationPicker({
         }}
       >
         <TileLayer
-          attribution="OpenStreetMap"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
         <ClickHandler onPick={({ lat, lng }) => pickPoint(lat, lng)} />
@@ -367,3 +367,4 @@ export default function LocationPicker({
     </div>
   );
 }
+

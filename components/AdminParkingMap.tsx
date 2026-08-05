@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { AttributionControl, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 
 type AdminParking = {
@@ -65,12 +65,14 @@ export default function AdminParkingMap({ parkings }: Props) {
       center={center as [number, number]}
       zoom={12}
       scrollWheelZoom
+      attributionControl={false}
       style={{
         height: 460,
         width: '100%',
         borderRadius: 12,
       }}
-    >
+    >        <AttributionControl prefix={false} />
+
       <TileLayer
         attribution='&copy; OpenStreetMap contributors &copy; CARTO'
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -105,4 +107,5 @@ export default function AdminParkingMap({ parkings }: Props) {
     </MapContainer>
   );
 }
+
 
